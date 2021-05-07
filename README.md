@@ -16,3 +16,4 @@ Laravel and MySQL used.
 php artisan migrate
 ```
 3. You can serve your project.
+4. enjoy!
