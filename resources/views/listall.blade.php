@@ -32,7 +32,7 @@
                         <li class="list-group-item"><img src="/price-tag.png"> {{$item->dailyPrice }} TL/gün</li>
                     </ul>
                     <div class="card-footer">
-                        <a href="#" class="btn btn-primary">Hemen kirala!</a>
+                        <a href="{{route('rent',['id' => $item->id])}}" class="btn btn-primary">Hemen kirala!</a>
                     </div>
                 </div>
             </div>
