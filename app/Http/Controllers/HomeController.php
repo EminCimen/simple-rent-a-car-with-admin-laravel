@@ -5,11 +5,13 @@ use App\Models\Admin;
 use App\Models\Car;
 use App\Models\Reservation;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class HomeController extends Controller
 {
@@ -21,13 +23,36 @@ class HomeController extends Controller
     public function listAll(){
        // $cars = Car::all();
         $cars = DB::table('cars')->where('isActive',1)->simplePaginate(8);
-        return view('listall')->with('cars',$cars);
+        return view('listall')->with('cars', $cars);
     }
 
     public function rent($id){
         $car = Car::find($id);
 
-        return view('rent')->with('car',$car);
+        return view('rent')->with('car', $car);
+    }
+
+    public function rentRequest(Request $request, $id){
+        $request->validate([
+            'day' => 'required'
+        ]);
+        $car = Car::find($id);
+        $price = $car['dailyPrice'];
+
+        $resevartion = new Reservation();
+        $resevartion->user_id = Auth::user()->id;
+        $resevartion->car_id = $id;
+        $resevartion->reservationStartDate = Carbon::now();
+        $resevartion->reservationEndDate = Carbon::now()->addDays($request->day);
+        $resevartion->price = $price * $request->day;
+        $resevartion->isConfirmed = 0;
+        if ($resevartion->save()){
+            Alert::alert('Başarılı', 'Rezarvasyon isteğiniz başarıyla oluşturuldu', 'success');
+            return redirect(route('memberSettings'));
+        } else {
+            Alert::alert('Hata', 'Rezarvasyon isteğiniz alınamadı', 'error');
+            return back();
+        }
     }
 
     public function login(){
@@ -88,7 +113,8 @@ class HomeController extends Controller
                 ->select('*')
             ->join('cars','reservations.car_id','=','cars.id')
             ->join('users','reservations.user_id','=','users.id')
-            ->where('reservations.user_id','=',Auth::id())->get();
+            ->where('reservations.user_id','=',Auth::id())
+            ->orderBy('reservations.reservationStartDate','DESC')->get();
 
         return view('membersettings')->with('reservations',$reservations);
     }
@@ -124,8 +150,4 @@ class HomeController extends Controller
         }
     }
 
-    public function ufuk(){
-        $parola = Hash::make('ufukdemirel01');
-        print_r($parola);
-    }
 }

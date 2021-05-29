@@ -16,7 +16,7 @@
 
 
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">View Details</a>
+                        <a class="small text-white stretched-link" href="{{route('backend.userlist.page')}}">Detayları Görüntüle</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                         <h3>{{$data['reservationsCount']}}</h3>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">View Details</a>
+                        <a class="small text-white stretched-link" href="{{route('backend.reservation.page')}}">Detayları görüntüle</a>
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         <h3>{{$data['pendingReservationsCount']}}</h3>
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">View Details</a>
+
                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                     </div>
                 </div>
@@ -69,33 +69,33 @@
                     <table class="table table-bordered" id="table_1" width="100%" cellspacing="0">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
+                            <th>Rezarvasyon Başlangıç</th>
+                            <th>Rezarvasyon Bitiş</th>
+                            <th>Araç</th>
+                            <th>Müşteri</th>
+                            <th>Ücret</th>
+                            <th>İşlem</th>
                         </tr>
                         </thead>
                         <tfoot>
                         <tr>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Office</th>
-                            <th>Age</th>
-                            <th>Start date</th>
-                            <th>Salary</th>
+                            <th>Rezarvasyon Başlangıç</th>
+                            <th>Rezarvasyon Bitiş</th>
+                            <th>Araç</th>
+                            <th>Müşteri</th>
+                            <th>Ücret</th>
+                            <th>İşlem</th>
                         </tr>
                         </tfoot>
                         <tbody>
                         @foreach($pendingReservations as $item)
                         <tr>
-                            <td>Tiger Nixon</td>
-                            <td>System Architect</td>
-                            <td>Edinburgh</td>
-                            <td>61</td>
-                            <td>2011/04/25</td>
-                            <td>$320,800</td>
+                            <td>{{date('d-m-Y H:i:s', strtotime($item->reservationStartDate))}}</td>
+                            <td>{{date('d-m-Y H:i:s', strtotime($item->reservationEndDate))}}</td>
+                            <td>{{$item->brand}} {{$item->model}}</td>
+                            <td>{{$item->name}}</td>
+                            <td>{{$item->price}}</td>
+                            <td><a href="{{route('backend.reservation',['id'=> $item->resid])}}">Onayla</a></td>
                         </tr>
                         @endforeach
 

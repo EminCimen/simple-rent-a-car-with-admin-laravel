@@ -32,7 +32,8 @@
             <div class="card h-200">
 
                 <div class="card-body">
-                    <form>
+                    <form action="{{route('rent.request',['id' => $car['id']])}}" method="post">
+                        @csrf
                         <div class="form-group">
                             <label>Adınız</label>
                             <input type="text" class="form-control" value="{{Auth::user()->name}}" disabled>
@@ -45,6 +46,12 @@
                             <label>Telefon Numaranız</label>
                             <input type="text" class="form-control" value="{{Auth::user()->user_phone}}" disabled>
                         </div>
+                        <div class="form-group">
+                            <label>Kaç Gün Kiralama Yapacaksınız?</label>
+                            <input type="text" class="form-control" name="day" >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">İstek Oluştur</button>
                     </form>
                 </div>
 

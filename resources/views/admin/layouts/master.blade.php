@@ -42,13 +42,9 @@
                         Dashboard
                     </a>
                     <div class="sb-sidenav-menu-heading">Rezervasyon</div>
-                    <a class="nav-link" href="{{route('backend.index')}}">
+                    <a class="nav-link" href="{{route('backend.reservation.page')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
-                        Rezervasyonlar
-                    </a>
-                    <a class="nav-link" href="{{route('backend.index')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-ticket-alt"></i></div>
-                        Rezervasyon Talepleri
+                        Tüm Rezervasyonlar
                     </a>
 
                     <div class="sb-sidenav-menu-heading">Araçlar</div>
@@ -63,7 +59,7 @@
 
 
                     <div class="sb-sidenav-menu-heading">Müşteriler</div>
-                    <a class="nav-link" href="{{route('backend.index')}}">
+                    <a class="nav-link" href="{{route('backend.userlist.page')}}">
                         <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                         Müşteri Listele
                     </a>

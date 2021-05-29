@@ -2,49 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use App\Models\Car;
 use App\Models\User;
 use App\Models\Reservation;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AdminController extends Controller
 {
-    public function login(){
+    public function login()
+    {
         return view('admin.login');
     }
 
-    public function loginAttempt(Request $request){
+    public function loginAttempt(Request $request)
+    {
 
-        if(Auth::attempt(['email' => $request->email , 'password' => $request->password, 'isAdmin' => 1 ],$request->rememberme)){
-            alert()->success('Giriş yaptınız','Hoş geldiniz');
+        if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'isAdmin' => 1], $request->rememberme)) {
+            alert()->success('Giriş yaptınız', 'Hoş geldiniz');
             return redirect()->intended(route('backend.index'));
-        }else{
-            alert()->error('Hatalı giriş','Bilgileri kontrol edin');
+        } else {
+            alert()->error('Hatalı giriş', 'Bilgileri kontrol edin');
             return redirect()->route('backend.login');
         }
 
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
-        alert()->success('Başarılı','Çıkış yaptınız');
+        alert()->success('Başarılı', 'Çıkış yaptınız');
         return redirect(route('backend.login'));
     }
 
     public function index()
     {
         $cars = Car::all()->where('isActive', 1);
-        $pendingReservations = Reservation::all()->where('isConfirmed', 0);
+
+        $pendingReservations =
+            DB::table('reservations')
+                ->where('isConfirmed', '=', '0')
+                ->join('cars', 'reservations.car_id', '=', 'cars.id')
+                ->join('users', 'reservations.user_id', '=', 'users.id')
+                ->orderBy('reservations.reservationStartDate', 'DESC')
+                ->get();
+
         $reservations = Reservation::all();
-        $users = User::all()->where('isActive', 1)->where('isAdmin',0);
+
+        $users = User::all()->where('isActive', 1)->where('isAdmin', 0);
+
         $data['carCount'] = count($cars);
         $data['pendingReservationsCount'] = count($pendingReservations);
         $data['reservationsCount'] = count($reservations);
         $data['userCount'] = count($users);
+
         return view('admin.dashboard', compact('data'))->with('pendingReservations', $pendingReservations);
     }
 
@@ -187,7 +203,7 @@ class AdminController extends Controller
 
     public function listAdmins()
     {
-        $admins = User::all()->where('isAdmin',true);
+        $admins = User::all()->where('isAdmin', true);
         return view('admin.adminlist')->with('admins', $admins);
     }
 
@@ -239,15 +255,88 @@ class AdminController extends Controller
 
     }
 
-    public function adminDelete($id){
-        $admin = User::where('id',$id)->delete();
-        if($admin){
+    public function adminDelete($id)
+    {
+        $admin = User::where('id', $id)->delete();
+        if ($admin) {
             alert()->success('Başarılı', 'Yönetici silindi');
             return redirect(route('backend.adminList'));
         } else {
             alert()->error('Hata', 'Hata oluştu');
             return redirect(route('backend.adminList'));
         }
+    }
+
+    public function reservationOperation($id)
+    {
+//        $reservation = Reservation::where('resid', '=', $id)->first();
+//        $reservation->isConfirmed = 1;
+
+        $reservation = DB::table('reservations')
+            ->where('resid', $id)
+            ->update(
+                ['isConfirmed' => 1]
+            );
+
+        if ($reservation) {
+            Alert::alert('Başarılı', 'Rezarvasyon isteği onaylandı', 'success');
+            return back();
+        } else {
+            Alert::alert('Hata', 'Rezarvasyon isteği onaylanırken hata oluştu', 'error');
+            return back();
+        }
+    }
+
+    public function reservationsPage()
+    {
+        $reservations =
+            DB::table('reservations')
+                ->join('cars', 'reservations.car_id', '=', 'cars.id')
+                ->join('users', 'reservations.user_id', '=', 'users.id')
+                ->orderBy('reservations.reservationStartDate', 'DESC')
+                ->get();
+
+        return view('admin.reservationsall')->with('reservations', $reservations);
+    }
+
+    public function userList()
+    {
+        $users = User::where('isAdmin', '=', 0)->get();
+
+        return view('admin.userlist')->with('users', $users);
+    }
+
+    public function userEdit($id)
+    {
+        $user = User::find($id);
+
+        return view('admin.userupdate')->with('user', $user);
+    }
+
+    public function userUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'user_tc' => 'required',
+            'name' => 'required',
+            'user_city' => 'required',
+            'user_phone' => 'required',
+            'user_birthday' => 'required',
+        ]);
+
+        $user = User::find($id);
+        $user->email = $request->email;
+        $user->name = $request->name;
+        $user->user_tc = $request->user_tc;
+        $user->user_city = $request->user_city;
+        $user->user_phone = $request->user_phone;
+        $user->user_birthday = $request->user_birthday;
+        if ($user->save()) {
+            Alert::alert('Başarılı', 'Üye başarıyla düzenlendi', 'success');
+        } else {
+            Alert::alert('Hata', 'Üye düzenlenirken hata oluştu', 'error');
+        }
+        return back();
     }
 
 }

@@ -23,12 +23,12 @@ Route::get('/kayit-ol',[HomeController::class,'register'])->name('register');
 Route::post('/kayit-ol',[HomeController::class,'registerStore'])->name('registerStore');
 Route::get('/tum-araclar',[HomeController::class,'listAll'])->name('listAll');
 Route::get('/kirala/{id}',[HomeController::class,'rent'])->name('rent')->middleware('isuser');
+Route::post('/kirala/{id}',[HomeController::class,'rentRequest'])->name('rent.request')->middleware('isuser');
 Route::get('/musteri-paneli',[HomeController::class,'memberSettings'])->name('memberSettings')->middleware('isuser');
 Route::get('/musteri-paneli/duzenle',[HomeController::class,'memberEdit'])->name('memberEdit')->middleware('isuser');
 Route::post('/musteri-paneli/duzenle',[HomeController::class,'memberStore'])->name('memberStore')->middleware('isuser');
 Route::get('/admin/login',[AdminController::class,'login'])->name('backend.login');
 Route::post('/admin/login',[AdminController::class,'loginAttempt'])->name('backend.loginAttempt');
-Route::get('/ufuk',[HomeController::class,'ufuk'])->name('ufuk');
 
 Route::group(['namespace' => 'backend' ,'middleware' => 'islogin'],function (){
     Route::get('/admin',[AdminController::class,'index'])->name('backend.index');
@@ -46,6 +46,11 @@ Route::group(['namespace' => 'backend' ,'middleware' => 'islogin'],function (){
     Route::post('/admin/adminAdd',[AdminController::class,'adminStore'])->name('backend.adminStore');
     Route::post('/admin/adminUpdate',[AdminController::class,'adminUpdate'])->name('backend.adminUpdate');
     Route::get('/admin/adminDelete/{id}',[AdminController::class,'adminDelete'])->name('backend.adminDelete');
+    Route::get('/admin/reservationConfirm/{id}',[AdminController::class,'reservationOperation'])->name('backend.reservation');
+    Route::get('/admin/reservations',[AdminController::class,'reservationsPage'])->name('backend.reservation.page');
+    Route::get('/admin/user/list',[AdminController::class,'userList'])->name('backend.userlist.page');
+    Route::get('/admin/user/{id}',[AdminController::class,'userEdit'])->name('backend.useredit.page');
+    Route::post('/admin/user/{id}',[AdminController::class,'userUpdate'])->name('backend.userupdate');
 });
 
 
